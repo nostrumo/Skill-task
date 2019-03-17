@@ -19,9 +19,9 @@ def model_baseline():
     classifier = Sequential()
     classifier.add(Dense(64, activation='relu', input_dim=data_train.shape[1]))
     for i in range(0,3):
-        classifier.add(Dense(units=128))
+        classifier.add(Dense(units=32))
         classifier.add(Activation('relu'))
-        classifier.add(Dropout(.4))
+        classifier.add(Dropout(.2))
     # First Hidden Layer
     #
     # # classifier.add(BatchNormalization())
@@ -76,14 +76,14 @@ x_train_data, y_train_data = data_processing(src.train_data, train=True)
 x_test_data = data_processing(src.test_data, train=False)
 
 # Поделим нашу тренировочную выборку на тренировочную и тестовую ( 80% и 20% соостветственно )
-data_train, data_test, y_data_train, y_data_test = data_spliter(x_train_data, y_train_data,0.1)
+data_train, data_test, y_data_train, y_data_test = data_spliter(x_train_data, y_train_data,0.01)
 
 # Обучаем модель
 model = model_baseline()
 history = model.fit(x=data_train,
                     y=y_data_train,
                     validation_data=(data_test,y_data_test),
-                    epochs=10,
+                    epochs=50,
                     shuffle=True,
                     batch_size=4)
 
@@ -108,6 +108,9 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.show()
 model.save('my_model1.h5')
 
+samples_ids=x_test_data.index.values.tolist()
 prediction = model.predict(x_test_data)
-for i in range(len(prediction)):
-    print(x_test_data[i],prediction)
+with open('my_csv.csv', 'w') as f:
+    f.write('sample_id,y\n')
+    for i in range(len(prediction)):
+        f.write(f'{samples_ids[i]},{prediction[i][0]}\n')
