@@ -17,8 +17,8 @@ def model_baseline():
     from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation, Input
 
     classifier = Sequential()
-    classifier.add(Dense(32, activation='relu', input_dim=data_train.shape[1]))
-    for i in range(0,5):
+    classifier.add(Dense(64, activation='relu', input_dim=data_train.shape[1]))
+    for i in range(0,3):
         classifier.add(Dense(units=128))
         classifier.add(Activation('relu'))
         classifier.add(Dropout(.4))
@@ -83,7 +83,7 @@ model = model_baseline()
 history = model.fit(x=data_train,
                     y=y_data_train,
                     validation_data=(data_test,y_data_test),
-                    epochs=50,
+                    epochs=10,
                     shuffle=True,
                     batch_size=4)
 
@@ -106,5 +106,8 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.show()
+model.save('my_model1.h5')
 
-
+prediction = model.predict(x_test_data)
+for i in range(len(prediction)):
+    print(x_test_data[i],prediction)
