@@ -20,13 +20,16 @@ def model_baseline():
     # First Hidden Layer
     classifier.add(Dense(64, activation='relu', input_dim=data_train.shape[1]))
     # classifier.add(BatchNormalization())
-    classifier.add(Dropout(.5))
+    classifier.add(Dropout(.25))
     # Second  Hidden Layer
+    classifier.add(Dense(16, activation='relu'))
+    # classifier.add(BatchNormalization())
+    classifier.add(Dropout(.25))
     classifier.add(Dense(32, activation='relu'))
     # classifier.add(BatchNormalization())
-    classifier.add(Dropout(.5))
-    classifier.add(Dense(16, activation='relu'))
-    classifier.add(Dropout(.5))
+    classifier.add(Dropout(.25))
+
+
     # Output Layer
     classifier.add(Dense(1, activation='sigmoid'))
     classifier.compile(optimizer=optimizers.Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
@@ -57,9 +60,9 @@ def data_processing(data_path, train=False):
     data_frame_norm = (data_frame - data_frame.mean()) / (data_frame.max() - data_frame.min())  # Нормируем данные
 
     if train:
-        return shuffle(data_frame_norm), y_frame
+        return data_frame_norm, y_frame
     else:
-        return shuffle(data_frame_norm)
+        return data_frame_norm
 
 
 # Подготавливаем данные для нейросети
@@ -74,7 +77,8 @@ model = model_baseline()
 history = model.fit(x=data_train,
                     y=y_data_train,
                     validation_data=(data_test,y_data_test),
-                    epochs=20,
+                    epochs=50,
+                    shuffle=True,
                     batch_size=1)
 
 result=model.evaluate(data_test,y_data_test)
