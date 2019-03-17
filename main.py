@@ -18,15 +18,8 @@ def model_baseline():
 
     Input_figure = Input(shape=(data_train.shape[1],), name='input1')
 
-    x = Dense(4, activation='relu')(Input_figure)
-    # x = Dropout(0.4)(x)
-
-    x = Dense(2, activation='relu')(Input_figure)
-    # x = Dropout(0.4)(x)
-
-    x = Dense(4, activation='relu')(Input_figure)
-    # x = Dropout(0.4)(x)
-
+    x = Dense(8, activation='relu')(Input_figure)
+    x = Dropout(0.2)(x)
     out = Dense(1, activation='sigmoid')(x)
     model = Model(inputs=Input_figure, outputs=out)
     model.summary()
@@ -38,7 +31,7 @@ def model_baseline():
 
 
 # Функция деления выборки на тестовую и тренеровочную
-def data_spliter(dataset,y_dataset,param=0.2):
+def data_spliter(dataset,y_dataset,param=0.3):
     data_test, data_train, y_data_test, y_data_train=train_test_split(dataset, y_dataset, test_size=param)
 
     print('data_test length :',data_test.shape)
@@ -77,9 +70,9 @@ model = model_baseline()
 history = model.fit(x=data_train,
                     y=y_data_train,
                     validation_data=(data_test,y_data_test),
-                    epochs=1,
+                    epochs=20,
                     shuffle=True,
-                    batch_size=10)
+                    batch_size=5)
 
 result=model.evaluate(data_test,y_data_test)
 print(result)
@@ -102,6 +95,9 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.show()
 model.save('my_model1.h5')
 
+from keras.models import load_model
+
+model = load_model('my_model1.h5')
 prediction=[]
 for row in np.array(x_test_data):
     prediction.append(model.predict(np.array([row])))
