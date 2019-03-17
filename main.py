@@ -17,17 +17,23 @@ def model_baseline():
     from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation, Input
 
     classifier = Sequential()
+    classifier.add(Dense(128, activation='relu', input_dim=data_train.shape[1]))
+    for i in range(0,3):
+        classifier.add(Dense(units=128))
+        classifier.add(Activation('relu'))
+        classifier.add(Dropout(.4))
     # First Hidden Layer
-    classifier.add(Dense(64, activation='relu', input_dim=data_train.shape[1]))
-    # classifier.add(BatchNormalization())
-    classifier.add(Dropout(.25))
-    # Second  Hidden Layer
-    classifier.add(Dense(16, activation='relu'))
-    # classifier.add(BatchNormalization())
-    classifier.add(Dropout(.25))
-    classifier.add(Dense(32, activation='relu'))
-    # classifier.add(BatchNormalization())
-    classifier.add(Dropout(.25))
+    #
+    # # classifier.add(BatchNormalization())
+    # classifier.add(Dropout(.25))
+    # # Second  Hidden Layer
+    # classifier.add(Dense(16, activation='relu'))
+    # # classifier.add(BatchNormalization())
+    # classifier.add(Dropout(.25))
+    # classifier.add(Dense(32, activation='relu'))
+    # # classifier.add(BatchNormalization())
+    # classifier.add(Dropout(.25))
+
 
 
     # Output Layer
@@ -79,7 +85,7 @@ history = model.fit(x=data_train,
                     validation_data=(data_test,y_data_test),
                     epochs=50,
                     shuffle=True,
-                    batch_size=1)
+                    batch_size=4)
 
 result=model.evaluate(data_test,y_data_test)
 print(result)
