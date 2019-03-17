@@ -16,31 +16,25 @@ def model_baseline():
     from keras.models import Model
     from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation, Input
 
-    classifier = Sequential()
-    classifier.add(Dense(64, activation='relu', input_dim=data_train.shape[1]))
-    for i in range(0,3):
-        classifier.add(Dense(units=32))
-        classifier.add(Activation('relu'))
-        classifier.add(Dropout(.2))
-    # First Hidden Layer
-    #
-    # # classifier.add(BatchNormalization())
-    # classifier.add(Dropout(.25))
-    # # Second  Hidden Layer
-    # classifier.add(Dense(16, activation='relu'))
-    # # classifier.add(BatchNormalization())
-    # classifier.add(Dropout(.25))
-    # classifier.add(Dense(32, activation='relu'))
-    # # classifier.add(BatchNormalization())
-    # classifier.add(Dropout(.25))
+    Input_figure = Input(shape=(data_train.shape[1],), name='input1')
 
+    x = Dense(4, activation='relu')(Input_figure)
+    # x = Dropout(0.4)(x)
 
+    x = Dense(2, activation='relu')(Input_figure)
+    # x = Dropout(0.4)(x)
 
-    # Output Layer
-    classifier.add(Dense(1, activation='sigmoid'))
-    classifier.compile(optimizer=optimizers.Adam(lr=1e-5), loss='binary_crossentropy', metrics=['accuracy'])
-    classifier.summary()
-    return classifier
+    x = Dense(4, activation='relu')(Input_figure)
+    # x = Dropout(0.4)(x)
+
+    out = Dense(1, activation='sigmoid')(x)
+    model = Model(inputs=Input_figure, outputs=out)
+    model.summary()
+    model.compile(optimizer='adam',
+                  loss='binary_crossentropy',
+                  metrics=["accuracy"]
+                  )
+    return model
 
 
 # Функция деления выборки на тестовую и тренеровочную
@@ -74,18 +68,18 @@ def data_processing(data_path, train=False):
 # Подготавливаем данные для нейросети
 x_train_data, y_train_data = data_processing(src.train_data, train=True)
 x_test_data = data_processing(src.test_data, train=False)
-
+print(x_test_data)
 # Поделим нашу тренировочную выборку на тренировочную и тестовую ( 80% и 20% соостветственно )
-data_train, data_test, y_data_train, y_data_test = data_spliter(x_train_data, y_train_data,0.01)
+data_train, data_test, y_data_train, y_data_test = data_spliter(x_train_data, y_train_data,0.2)
 
 # Обучаем модель
 model = model_baseline()
 history = model.fit(x=data_train,
                     y=y_data_train,
                     validation_data=(data_test,y_data_test),
-                    epochs=50,
+                    epochs=1,
                     shuffle=True,
-                    batch_size=4)
+                    batch_size=10)
 
 result=model.evaluate(data_test,y_data_test)
 print(result)
@@ -108,9 +102,12 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.show()
 model.save('my_model1.h5')
 
+prediction=[]
+for row in np.array(x_test_data):
+    prediction.append(model.predict(np.array([row])))
 samples_ids=x_test_data.index.values.tolist()
-prediction = model.predict(x_test_data)
+print(prediction)
 with open('my_csv.csv', 'w') as f:
     f.write('sample_id,y\n')
     for i in range(len(prediction)):
-        f.write(f'{samples_ids[i]},{prediction[i][0]}\n')
+        f.write(f'{samples_ids[i]},{prediction[i][0][0]}\n')
