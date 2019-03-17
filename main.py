@@ -17,8 +17,8 @@ def model_baseline():
     from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation, Input
 
     classifier = Sequential()
-    classifier.add(Dense(128, activation='relu', input_dim=data_train.shape[1]))
-    for i in range(0,3):
+    classifier.add(Dense(32, activation='relu', input_dim=data_train.shape[1]))
+    for i in range(0,5):
         classifier.add(Dense(units=128))
         classifier.add(Activation('relu'))
         classifier.add(Dropout(.4))
