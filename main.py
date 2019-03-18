@@ -9,20 +9,24 @@ from keras.callbacks import ModelCheckpoint
 
 
 def model_baseline():
-    import keras.optimizers as optimizers
-    from keras import Sequential
-    # opt = SGD(lr=0.01)
-    from keras.layers import Dense
     from keras.models import Model
     from keras.layers import Dense, Dropout, Flatten, BatchNormalization, Activation, Input
 
+    # Описываем архитектуру сети
     Input_figure = Input(shape=(data_train.shape[1],), name='input1')
-
-    x = Dense(8, activation='relu')(Input_figure)
+    x = Dense(64, activation='relu')(Input_figure)
+    x = Dropout(0.2)(x)
+    x = Dense(32, activation='relu')(x)
+    x = Dropout(0.2)(x)
+    x = Dense(128, activation='relu')(x)
     x = Dropout(0.2)(x)
     out = Dense(1, activation='sigmoid')(x)
+
+    # Объявляем какие входы являются входны и выходным
     model = Model(inputs=Input_figure, outputs=out)
     model.summary()
+
+    # Компилируем нейронную сеть
     model.compile(optimizer='adam',
                   loss='binary_crossentropy',
                   metrics=["accuracy"]
@@ -93,16 +97,19 @@ plt.ylabel('loss')
 plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.show()
+
+# Сохраняем веса и модель нейросети
 model.save('my_model1.h5')
 
 from keras.models import load_model
 
-model = load_model('my_model1.h5')
+# Строим предсказания
 prediction=[]
 for row in np.array(x_test_data):
     prediction.append(model.predict(np.array([row])))
 samples_ids=x_test_data.index.values.tolist()
-print(prediction)
+
+# Сохраняем предсказанные данные
 with open('my_csv.csv', 'w') as f:
     f.write('sample_id,y\n')
     for i in range(len(prediction)):
