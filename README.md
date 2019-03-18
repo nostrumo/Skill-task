@@ -1,2 +1,0 @@
-# Skill-task
-Kaggle competition 
